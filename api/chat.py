@@ -56,7 +56,11 @@ def _ask_gemini(api_key, context, question, history):
     payload = {
         "system_instruction": {"parts": [{"text": SYSTEM.format(context=context)}]},
         "contents": contents,
-        "generationConfig": {"maxOutputTokens": 800, "temperature": 0.7},
+        "generationConfig": {
+            "maxOutputTokens": 800,
+            "temperature": 0.7,
+            "thinkingConfig": {"thinkingBudget": 0},  # 2.5-flash 사고 비활성(답변 잘림·지연 방지)
+        },
     }
     url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
            f"{MODEL}:generateContent?key={api_key}")
