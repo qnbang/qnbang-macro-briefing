@@ -3,7 +3,7 @@
 매크로 브리핑 챗봇 — Vercel 서버리스 함수 (/api/chat)
 - 오늘 브리핑 맥락(bot-context.json)을 바탕으로 사용자의 질문에 '판단 틀'로 답한다.
 - 규제 방어선: 매수/매도·개별 종목·목표가 금지, 자산군 레벨 관점 + 면책. 학습·관찰 도구 톤.
-- 모델: Haiku(저렴). 키는 환경변수 ANTHROPIC_API_KEY(코드에 넣지 않음).
+- 모델: Google Gemini Flash(무료 등급). 키는 환경변수 GEMINI_API_KEY(코드에 넣지 않음).
 """
 from http.server import BaseHTTPRequestHandler
 import json
@@ -11,7 +11,7 @@ import os
 import urllib.request
 import urllib.error
 
-MODEL = "claude-haiku-4-5-20251001"
+MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
 FALLBACK_HOST = "qnbang-macro-briefing.vercel.app"
 
 SYSTEM = """당신은 '매크로 브리핑 봇'입니다. 한국 개인투자자에게 거시 흐름을 쉽게 설명하고 '스스로 판단할 틀'을 주는 학습·관찰 도우미입니다.
@@ -42,34 +42,36 @@ def _load_context(host):
     return "(오늘 브리핑 맥락을 불러오지 못했습니다. 일반적인 원칙 위주로 답하세요.)"
 
 
-def _ask_claude(api_key, context, question, history):
-    msgs = []
+def _ask_gemini(api_key, context, question, history):
+    contents = []
     for turn in (history or [])[-6:]:
         role = turn.get("role")
-        content = (turn.get("content") or "").strip()
-        if role in ("user", "assistant") and content:
-            msgs.append({"role": role, "content": content})
-    msgs.append({"role": "user", "content": question})
+        text = (turn.get("content") or "").strip()
+        if not text:
+            continue
+        g_role = "user" if role == "user" else "model"  # Gemini는 'model' 사용
+        contents.append({"role": g_role, "parts": [{"text": text}]})
+    contents.append({"role": "user", "parts": [{"text": question}]})
 
     payload = {
-        "model": MODEL,
-        "max_tokens": 700,
-        "system": SYSTEM.format(context=context),
-        "messages": msgs,
+        "system_instruction": {"parts": [{"text": SYSTEM.format(context=context)}]},
+        "contents": contents,
+        "generationConfig": {"maxOutputTokens": 800, "temperature": 0.7},
     }
+    url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
+           f"{MODEL}:generateContent?key={api_key}")
     req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={
-            "content-type": "application/json",
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-        },
+        url, data=json.dumps(payload).encode("utf-8"),
+        headers={"content-type": "application/json"},
     )
     with urllib.request.urlopen(req, timeout=40) as resp:
         data = json.loads(resp.read().decode())
-    parts = [b.get("text", "") for b in data.get("content", []) if b.get("type") == "text"]
-    return "".join(parts).strip() or "음, 답을 만들지 못했어요. 다시 한 번 물어봐 주세요."
+    cands = data.get("candidates", [])
+    if not cands:
+        return "음, 답을 만들지 못했어요. 다시 한 번 물어봐 주세요."
+    parts = cands[0].get("content", {}).get("parts", [])
+    text = "".join(p.get("text", "") for p in parts).strip()
+    return text or "음, 답을 만들지 못했어요. 다시 한 번 물어봐 주세요."
 
 
 class handler(BaseHTTPRequestHandler):
@@ -94,14 +96,14 @@ class handler(BaseHTTPRequestHandler):
         if len(question) > 800:
             question = question[:800]
 
-        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
         if not api_key:
             return self._send(503, {"error": "챗봇이 아직 준비 중이에요(키 미설정). 잠시 후 다시 시도해 주세요."})
 
         host = self.headers.get("host", "")
         context = _load_context(host)
         try:
-            answer = _ask_claude(api_key, context, question, body.get("history"))
+            answer = _ask_gemini(api_key, context, question, body.get("history"))
             return self._send(200, {"answer": answer})
         except urllib.error.HTTPError as e:
             detail = ""
