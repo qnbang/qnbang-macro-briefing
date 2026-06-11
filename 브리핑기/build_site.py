@@ -8,6 +8,7 @@
 - 산출물: site/index.html(최신), site/archive/<id>.html(과거본), site/data.json(원자료).
 """
 import os
+import re
 import json
 import html
 import sqlite3
@@ -178,7 +179,46 @@ def page(body, title):
 <style>{css}</style></head><body><div class="wrap">{body}</div></body></html>"""
 
 
-def render_briefing(c, brow, market, is_archive=False):
+def build_bot_context(b, market):
+    """챗봇이 '오늘 브리핑'으로 답하도록 줄 압축 맥락 텍스트."""
+    lines = [f"오늘은 {b.get('date','')} 데일리 브리핑."]
+    w = b.get("weather", {})
+    if w:
+        lines.append(f"시장 날씨: {w.get('state','')} — {w.get('desc','')}")
+    if b.get("title"):
+        lines.append(f"핵심: {b['title']}")
+    # 핵심 시세(검증된 숫자만)
+    names = {"USDKRW": "원/달러", "WTI": "WTI유가", "KOSPI": "코스피", "US10Y": "미10년물금리",
+             "GOLD": "금", "DXY": "달러지수", "VIX": "VIX", "SPX": "S&P500"}
+    quotes = []
+    for code, nm in names.items():
+        r = market.get(code)
+        if r:
+            chg = f"({r['daily_change']:+.2f}%)" if r["daily_change"] is not None else ""
+            quotes.append(f"{nm} {fmt_value(code, r['value'], r['unit'])}{chg}")
+    if quotes:
+        lines.append("오늘 시세: " + ", ".join(quotes))
+    # 투자 관점
+    st = b.get("stance", {})
+    if st:
+        lines.append(f"오늘의 관점(한줄): {st.get('title','')}")
+    if b.get("increase"):
+        lines.append("비중 늘릴 것: " + ", ".join(b["increase"]))
+    if b.get("decrease"):
+        lines.append("줄이거나 미룰 것: " + ", ".join(b["decrease"]))
+    # 흐름
+    if b.get("flow"):
+        chain = " → ".join(f"{s['title']}" for s in b["flow"])
+        lines.append("오늘의 흐름: " + chain)
+    # 자산별 관점
+    for v in b.get("views", []):
+        why = re.sub(r"<[^>]+>", "", v.get("why", ""))
+        how = re.sub(r"<[^>]+>", "", v.get("how", ""))
+        lines.append(f"[{v.get('name','')} · {v.get('badge','')}] {why} {how}")
+    return "\n".join(lines)
+
+
+def render_briefing(c, brow, market, is_archive=False, with_chat=False):
     b = json.loads(brow["content"])
     period = b.get("period", "daily")
     date_str = brow["date"]
@@ -266,6 +306,8 @@ def render_briefing(c, brow, market, is_archive=False):
 
     body = (head + weather + plain + stance + twocol + views + ind_sec + full_mkt
             + flow_sec + weekly + monthly + scn_sec + terms_block + src + nav + disc)
+    if with_chat:
+        body += CHAT_WIDGET
     return page(body, f"매크로 브리핑 — {date_str}")
 
 
@@ -301,10 +343,16 @@ def build():
         print("브리핑이 없습니다. 먼저 생성하세요.")
         return
 
-    # 최신 → index.html
+    # 최신 → index.html (+ 챗봇 위젯)
     latest = briefings[0]
     with open(os.path.join(SITE, "index.html"), "w", encoding="utf-8") as f:
-        f.write(render_briefing(c, latest, market))
+        f.write(render_briefing(c, latest, market, with_chat=True))
+
+    # 챗봇용 오늘 맥락
+    latest_b = json.loads(latest["content"])
+    with open(os.path.join(SITE, "bot-context.json"), "w", encoding="utf-8") as f:
+        json.dump({"date": latest["date"], "context": build_bot_context(latest_b, market)},
+                  f, ensure_ascii=False, indent=2)
 
     # 전체 → archive/<id>.html
     for br in briefings:
@@ -415,6 +463,83 @@ summary{font-size:13.5px;font-weight:700;cursor:pointer;padding:10px 0;color:#37
 .arow .ad{font-size:12.5px;color:var(--sub);white-space:nowrap}
 .arow .ap{font-size:11px;font-weight:800;color:var(--down);background:#eef4fd;border-radius:6px;padding:2px 7px;white-space:nowrap}
 .arow .at{font-size:13.5px;font-weight:600}
+"""
+
+
+CHAT_WIDGET = """
+<style>
+#mbot-fab{position:fixed;right:18px;bottom:18px;z-index:50;width:58px;height:58px;border:none;border-radius:50%;
+  background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;font-size:26px;cursor:pointer;
+  box-shadow:0 8px 22px rgba(37,99,235,.4);transition:transform .15s}
+#mbot-fab:hover{transform:scale(1.06)}
+#mbot-fab .badge{position:absolute;top:-3px;right:-3px;background:#e0392b;color:#fff;font-size:10px;font-weight:800;
+  border-radius:10px;padding:1px 6px}
+#mbot{position:fixed;right:18px;bottom:18px;z-index:51;width:min(400px,calc(100vw - 24px));height:min(640px,calc(100vh - 36px));
+  background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(15,23,42,.32);display:none;flex-direction:column;overflow:hidden}
+#mbot.open{display:flex}
+#mbot .hd{background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px}
+#mbot .hd .av{font-size:22px}
+#mbot .hd .t{font-weight:800;font-size:14.5px}
+#mbot .hd .s{font-size:11.5px;opacity:.85}
+#mbot .hd .x{margin-left:auto;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;opacity:.85}
+#mbot .body{flex:1;overflow-y:auto;padding:14px;background:#f4f6f9;display:flex;flex-direction:column;gap:10px}
+#mbot .msg{max-width:85%;padding:10px 13px;border-radius:14px;font-size:13.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+#mbot .bot{background:#fff;border:1px solid #e9ebef;align-self:flex-start;border-bottom-left-radius:4px}
+#mbot .me{background:#2563eb;color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+#mbot .sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+#mbot .sug button{font-size:12px;border:1px solid #cfe0f5;background:#fff;color:#2563eb;border-radius:16px;padding:6px 11px;cursor:pointer}
+#mbot .typing{font-size:13px;color:#8a93a0;align-self:flex-start;padding:4px 6px}
+#mbot .ft{border-top:1px solid #e9ebef;padding:9px;display:flex;gap:8px;background:#fff}
+#mbot .ft input{flex:1;border:1px solid #d8dde6;border-radius:20px;padding:9px 14px;font-size:13.5px;outline:none}
+#mbot .ft button{border:none;background:#2563eb;color:#fff;border-radius:20px;padding:0 16px;font-weight:700;cursor:pointer}
+#mbot .ft button:disabled{opacity:.5}
+#mbot .disc{font-size:10px;color:#aab1bd;text-align:center;padding:5px 10px 9px;background:#fff}
+</style>
+<button id="mbot-fab" aria-label="브리핑 봇 열기">💬<span class="badge">봇</span></button>
+<div id="mbot" role="dialog" aria-label="매크로 브리핑 봇">
+  <div class="hd"><span class="av">📈</span><div><div class="t">매크로 브리핑 봇</div>
+    <div class="s">오늘 브리핑을 알고 있어요</div></div>
+    <button class="x" aria-label="닫기">×</button></div>
+  <div class="body" id="mbot-body"></div>
+  <div class="ft"><input id="mbot-in" placeholder="궁금한 걸 물어보세요…" autocomplete="off"/>
+    <button id="mbot-send">전송</button></div>
+  <div class="disc">학습·관찰용 도우미예요. 매수/매도 권유가 아닙니다.</div>
+</div>
+<script>
+(function(){
+  var fab=document.getElementById('mbot-fab'),box=document.getElementById('mbot'),
+      body=document.getElementById('mbot-body'),inp=document.getElementById('mbot-in'),
+      send=document.getElementById('mbot-send'),hist=[],busy=false,greeted=false;
+  var SUG=["환율이 왜 이렇게 올랐어요?","지금 달러 사도 안 늦었나요?","금 지금 사도 돼요?","한국 주식 어떻게 봐야 해요?"];
+  function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+  function add(side,text){var m=document.createElement('div');m.className='msg '+side;m.innerHTML=esc(text);
+    body.appendChild(m);body.scrollTop=body.scrollHeight;return m;}
+  function suggest(){var w=document.createElement('div');w.className='sug';
+    SUG.forEach(function(q){var b=document.createElement('button');b.textContent=q;
+      b.onclick=function(){ask(q);};w.appendChild(b);});body.appendChild(w);body.scrollTop=body.scrollHeight;}
+  function greet(){if(greeted)return;greeted=true;
+    add('bot','안녕하세요! 오늘 브리핑을 바탕으로 편하게 답해드려요. 단, 「사라/팔라」 대신 스스로 판단할 틀을 드립니다. 무엇이 궁금하세요? 👇');suggest();}
+  function ask(q){
+    if(busy||!q.trim())return;busy=true;send.disabled=true;
+    document.querySelectorAll('#mbot .sug').forEach(function(e){e.remove();});
+    add('me',q);hist.push({role:'user',content:q});inp.value='';
+    var t=document.createElement('div');t.className='typing';t.textContent='생각하는 중…';
+    body.appendChild(t);body.scrollTop=body.scrollHeight;
+    fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({question:q,history:hist.slice(0,-1)})})
+      .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+      .then(function(o){t.remove();
+        var a=o.ok?o.j.answer:(o.j.error||'잠시 후 다시 시도해 주세요.');
+        add('bot',a);if(o.ok)hist.push({role:'assistant',content:a});})
+      .catch(function(){t.remove();add('bot','연결이 잠깐 끊겼어요. 다시 시도해 주세요.');})
+      .finally(function(){busy=false;send.disabled=false;inp.focus();});
+  }
+  fab.onclick=function(){box.classList.add('open');fab.style.display='none';greet();inp.focus();};
+  box.querySelector('.x').onclick=function(){box.classList.remove('open');fab.style.display='block';};
+  send.onclick=function(){ask(inp.value);};
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')ask(inp.value);});
+})();
+</script>
 """
 
 
