@@ -261,8 +261,8 @@ def render_briefing(c, brow, market, is_archive=False):
         '<div class="disc">본 자료는 거시 흐름 학습·관찰용이며 투자 자문이나 매매 권유가 아닙니다.<br>'
         '모든 수치는 출처를 명시했고, 검증 불가 수치는 제외했습니다. 투자 판단과 책임은 본인에게 있습니다.</div>'
     )
-    nav = '<div class="nav"><a href="index.html">← 최신 브리핑</a></div>' if is_archive else \
-          '<div class="nav"><a href="archive.html">📚 지난 브리핑 보기</a></div>'
+    nav = '<div class="nav"><a href="/">← 최신 브리핑</a></div>' if is_archive else \
+          '<div class="nav"><a href="/archive">📚 지난 브리핑 보기</a></div>'
 
     body = (head + weather + plain + stance + twocol + views + ind_sec + full_mkt
             + flow_sec + weekly + monthly + scn_sec + terms_block + src + nav + disc)
@@ -278,13 +278,13 @@ def render_archive_index(c):
         b = json.loads(r["content"])
         plabel = PERIOD_KR.get(b.get("period", "daily"), "")
         items.append(
-            f'<a class="arow" href="archive/{esc(r["id"])}.html">'
+            f'<a class="arow" href="/archive/{esc(r["id"])}">'
             f'<span class="ad">{esc(fmt_date_kr(r["date"]))}</span>'
             f'<span class="ap">{esc(plabel)}</span>'
             f'<span class="at">{esc(b.get("title",""))}</span></a>'
         )
     body = ('<div class="top"><div class="brand">📚 지난 브리핑</div>'
-            '<div class="date"><a href="index.html">← 최신</a></div></div>'
+            '<div class="date"><a href="/">← 최신</a></div></div>'
             '<div class="arclist">' + "".join(items) + "</div>")
     return page(body, "매크로 브리핑 — 아카이브")
 
