@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>매크로 브리핑 — 시장 날씨 대시보드 (시안 v1)</title>
+<style>
+  /* 한국 증시 관례: 상승=빨강, 하락=파랑 */
+  :root{
+    --up:#e0392b; --down:#1f6fd6; --ink:#1a1d21;
+    --sub:#6b7280; --line:#e9ebef; --bg:#f4f6f9; --card:#ffffff;
+    --warn:#f59e0b; --good:#16a34a; --bad:#dc2626; --neutral:#9ca3af;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.6; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:720px; margin:0 auto; padding:18px 16px 60px}
+
+  /* 헤더 */
+  .top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px}
+  .brand{font-weight:800; font-size:18px; letter-spacing:-.3px}
+  .date{color:var(--sub); font-size:13px}
+
+  /* 시장 날씨 게이지 */
+  .weather{background:linear-gradient(135deg,#374151,#1f2937); color:#fff; border-radius:20px;
+    padding:22px; display:flex; align-items:center; gap:18px; box-shadow:0 8px 24px rgba(31,41,55,.18)}
+  .weather .emoji{font-size:56px; line-height:1}
+  .weather .label{font-size:13px; opacity:.75; letter-spacing:2px}
+  .weather .state{font-size:26px; font-weight:800; margin:2px 0}
+  .weather .desc{font-size:14px; opacity:.9}
+
+  /* 쉽게 말하면 */
+  .plain{background:#fff7e6; border:1px solid #ffe2a8; border-radius:16px; padding:16px 18px; margin-top:14px}
+  .plain h3{font-size:13px; color:#b7791f; margin-bottom:6px; font-weight:700}
+  .plain p{font-size:15.5px; font-weight:500}
+
+  /* 섹션 제목 */
+  .sec{margin:26px 0 12px; font-size:14px; font-weight:800; color:#374151; letter-spacing:-.2px}
+  .sec small{font-weight:500; color:var(--sub); margin-left:6px}
+
+  /* 지표 카드 그리드 */
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .ind{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px}
+  .ind .name{font-size:12.5px; color:var(--sub)}
+  .ind .val{font-size:21px; font-weight:800; margin:2px 0; display:flex; align-items:center; gap:6px}
+  .ind .chg{font-size:12px; font-weight:700; padding:1px 7px; border-radius:20px}
+  .up{color:var(--up)} .down{color:var(--down)}
+  .chg.up{background:#fde8e6; color:var(--up)} .chg.down{background:#e6f0fb; color:var(--down)}
+  .ind .mean{font-size:12.5px; color:#4b5563; margin-top:6px; border-top:1px dashed var(--line); padding-top:7px}
+
+  /* 흐름 카드 */
+  .flow{display:flex; flex-direction:column; gap:0}
+  .step{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:13px 15px; position:relative}
+  .step .tag{font-size:11px; font-weight:800; color:#fff; background:#374151; border-radius:6px; padding:1px 7px; margin-right:8px}
+  .step .tag.kr{background:var(--up)}
+  .step b{font-size:14.5px}
+  .step p{font-size:12.5px; color:#6b7280; margin-top:3px}
+  .arrow{text-align:center; color:#cbd1da; font-size:18px; line-height:1; padding:4px 0}
+
+  /* 투자 관점 카드 */
+  .views{display:flex; flex-direction:column; gap:9px}
+  .view{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:13px 15px;
+    display:flex; align-items:flex-start; gap:12px}
+  .badge{flex-shrink:0; font-size:12px; font-weight:800; padding:4px 11px; border-radius:20px; margin-top:2px}
+  .b-good{background:#dcfce7; color:#15803d} .b-warn{background:#fef3c7; color:#b45309}
+  .b-bad{background:#fee2e2; color:#b91c1c} .b-neu{background:#f1f5f9; color:#475569}
+  .view .vname{font-size:14.5px; font-weight:700}
+  .view .vwhy{font-size:12.5px; color:#5b6473; margin-top:2px}
+
+  /* 용어 접기 */
+  details{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 16px; margin-top:10px}
+  summary{font-size:13.5px; font-weight:700; cursor:pointer; padding:10px 0; color:#374151}
+  .term{padding:8px 0; border-top:1px dashed var(--line); font-size:13px}
+  .term b{color:var(--ink)} .term span{color:#6b7280}
+
+  /* 면책 */
+  .disc{margin-top:24px; font-size:11.5px; color:#9ca3af; text-align:center; line-height:1.7}
+  .src{margin-top:10px; font-size:11.5px; color:#9ca3af}
+  .src a{color:#9ca3af}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">📈 매크로 브리핑</div>
+    <div class="date">2026년 6월 11일 (목) · 위클리 종합</div>
+  </div>
+
+  <!-- 시장 날씨 -->
+  <div class="weather">
+    <div class="emoji">⛈️</div>
+    <div>
+      <div class="label">오늘의 시장 날씨</div>
+      <div class="state">흐리고 비 · 우산 챙기세요</div>
+      <div class="desc">중동發 기름값 충격이 물가·금리를 자극 → 위험자산엔 역풍이 부는 국면</div>
+    </div>
+  </div>
+
+  <!-- 쉽게 말하면 -->
+  <div class="plain">
+    <h3>🗣️ 쉽게 말하면</h3>
+    <p>중동 갈등으로 <b>기름값이 뛰자</b> 미국 물가가 3년 만에 가장 높아졌어요. 그래서 미국이 <b>금리를 못 내리는 상황</b>이 됐고, 그 여파로 <b>외국인 투자자들이 한국 주식을 19일째 팔고</b> 떠나면서 <b>환율(달러값)이 비싸졌습니다.</b> 당분간 한국 시장엔 부담이 큰 환경이에요.</p>
+  </div>
+
+  <!-- 핵심 지표 -->
+  <div class="sec">📊 핵심 지표 <small>숫자 옆에 '무슨 뜻인지' 한 줄</small></div>
+  <div class="grid">
+    <div class="ind">
+      <div class="name">원/달러 환율</div>
+      <div class="val">1,520원 <span class="chg up">달러 강세</span></div>
+      <div class="mean">달러가 비싸졌다 = 외국인이 한국을 떠나는 신호. 수입물가도 오름.</div>
+    </div>
+    <div class="ind">
+      <div class="name">국제 유가 (WTI)</div>
+      <div class="val">$96.02 <span class="chg up">▲ 2.4%</span></div>
+      <div class="mean">기름값 급등 = 모든 물가의 원천. 한국은 전량 수입이라 직격탄.</div>
+    </div>
+    <div class="ind">
+      <div class="name">미국 물가 (CPI)</div>
+      <div class="val">+4.2% <span class="chg up">3년래 최고</span></div>
+      <div class="mean">물가가 다시 뜨거움 = 미국이 금리를 못 내림. 상승분 60%가 기름값.</div>
+    </div>
+    <div class="ind">
+      <div class="name">미국 기준금리</div>
+      <div class="val">3.50~3.75% <span class="chg down">동결 유력</span></div>
+      <div class="mean">다음 주 회의서 '그대로'가 유력. 올해 인하는 사실상 물 건너감.</div>
+    </div>
+    <div class="ind">
+      <div class="name">외국인 (코스피)</div>
+      <div class="val"><span class="down">19일 연속 순매도</span></div>
+      <div class="mean">누적 5조 원+ 매도. 한국 증시·환율을 흔드는 가장 큰 변수.</div>
+    </div>
+    <div class="ind">
+      <div class="name">미 국채 10년 금리</div>
+      <div class="val">4.35% <span class="chg up">상방</span></div>
+      <div class="mean">안전한 미국 이자가 높음 = 위험한 신흥국에서 돈이 빠짐.</div>
+    </div>
+  </div>
+
+  <!-- 흐름 -->
+  <div class="sec">🔗 오늘의 흐름 <small>사건이 어떻게 한국까지 오는가</small></div>
+  <div class="flow">
+    <div class="step"><span class="tag">사건</span><b>중동(미-이란) 갈등</b><p>지정학 리스크 고조</p></div>
+    <div class="arrow">↓</div>
+    <div class="step"><span class="tag">1차</span><b>기름값 급등</b><p>WTI $96, 에너지 가격 전반 상승</p></div>
+    <div class="arrow">↓</div>
+    <div class="step"><span class="tag">2차</span><b>미국 물가 3년래 최고</b><p>CPI +4.2%, 상승분의 60%가 에너지</p></div>
+    <div class="arrow">↓</div>
+    <div class="step"><span class="tag">3차</span><b>미국 금리 인하 차단</b><p>달러·국채금리 상방 압력</p></div>
+    <div class="arrow">↓</div>
+    <div class="step"><span class="tag kr">한국</span><b>외국인 이탈 · 원화 약세</b><p>19일 순매도 · 환율 1,520 · 에너지 수입 부담</p></div>
+  </div>
+
+  <!-- 투자 관점 -->
+  <div class="sec">🧭 이런 국면, 어떻게 볼까 <small>자산군별 성격 — 종목 추천 아님</small></div>
+  <div class="views">
+    <div class="view">
+      <span class="badge b-good">유리</span>
+      <div><div class="vname">달러 · 현금성 자산</div>
+      <div class="vwhy">불확실성 클 땐 안전한 달러로 돈이 몰립니다. 환율이 높을 때 이미 가진 달러는 유리.</div></div>
+    </div>
+    <div class="view">
+      <span class="badge b-warn">주의</span>
+      <div><div class="vname">한국 주식 (특히 외국인 많은 대형주)</div>
+      <div class="vwhy">외국인이 계속 파는 구간. 분쟁 완화·외국인 복귀 신호가 나오기 전엔 변동성 큼.</div></div>
+    </div>
+    <div class="view">
+      <span class="badge b-neu">중립~유리</span>
+      <div><div class="vname">금 · 안전자산</div>
+      <div class="vwhy">물가·불확실성 헤지 수요. 각국 중앙은행이 4년째 금을 사 모으는 중.</div></div>
+    </div>
+    <div class="view">
+      <span class="badge b-warn">변동성 큼</span>
+      <div><div class="vname">에너지 관련</div>
+      <div class="vwhy">기름값 상승의 직접 수혜지만, 분쟁이 풀리면 급락 위험도 함께 큼.</div></div>
+    </div>
+    <div class="view">
+      <span class="badge b-neu">중립</span>
+      <div><div class="vname">채권</div>
+      <div class="vwhy">금리가 높게 유지 → 새로 사면 이자 매력은 높지만, 가격 상승은 당분간 제한적.</div></div>
+    </div>
+  </div>
+
+  <!-- 용어 -->
+  <details>
+    <summary>📖 어려운 말 풀이 (펼치기)</summary>
+    <div class="term"><b>CPI(소비자물가지수)</b> <span>— 우리가 사는 물건·서비스 값이 1년 전보다 얼마나 올랐는지. 높으면 '물가가 뜨겁다'.</span></div>
+    <div class="term"><b>기준금리</b> <span>— 한 나라가 정하는 '돈의 값'. 높으면 대출이자↑·예금이자↑, 위험자산엔 불리.</span></div>
+    <div class="term"><b>외국인 순매도</b> <span>— 외국 투자자가 산 것보다 판 게 많음. 한국 증시는 외국인 비중이 커서 이들이 팔면 지수·환율이 흔들림.</span></div>
+    <div class="term"><b>WTI</b> <span>— 미국산 원유 가격, 국제 기름값의 대표 기준.</span></div>
+    <div class="term"><b>헤지(hedge)</b> <span>— 손실에 대비해 '보험'처럼 반대 방향 자산을 갖는 것.</span></div>
+  </details>
+
+  <!-- 출처 -->
+  <div class="src">📌 출처: 머니투데이(외국인·환율) · CNBC(유가·금리) · mitrade(연준·CPI) — <span>의심스러운 수치(코스피 지수 레벨)는 검증 실패로 제외함</span></div>
+
+  <!-- 면책 -->
+  <div class="disc">
+    본 자료는 거시 흐름 학습·관찰용이며 투자 자문이나 매매 권유가 아닙니다.<br>
+    모든 수치는 출처를 명시했고, 검증 불가 수치는 제외했습니다. 투자 판단과 책임은 본인에게 있습니다.
+  </div>
+
+</div>
+</body>
+</html>

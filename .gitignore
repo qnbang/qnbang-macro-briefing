@@ -1,0 +1,13 @@
+# 파이썬 가상환경·캐시 (배포에 불필요)
+브리핑기/.venv/
+__pycache__/
+*.pyc
+
+# Vercel 로컬 링크·시스템 파일
+.vercel/
+.DS_Store
+.env
+*.log
+
+# 디자인 시안(작업용 원본 — 배포 대상 아님)
+# site/ 와 macro_briefing.db 는 '추적'한다(배포·이력의 원천이므로 무시하지 않음)

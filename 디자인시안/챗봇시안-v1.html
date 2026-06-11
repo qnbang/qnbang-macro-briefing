@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>매크로 브리핑 — 챗봇 시안 v1</title>
+<style>
+  :root{--ink:#1a1d21; --sub:#6b7280; --line:#e9ebef; --bg:#f4f6f9; --me:#fee500; --bot:#ffffff; --accent:#2563eb}
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",sans-serif;
+    background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased}
+  .phone{max-width:440px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; background:#b2c7d9}
+
+  /* 헤더 */
+  .cbar{background:#1f2937; color:#fff; padding:14px 16px; display:flex; align-items:center; gap:10px; position:sticky; top:0; z-index:5}
+  .cbar .ava{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#2563eb,#1e3a5f); display:flex; align-items:center; justify-content:center; font-size:18px}
+  .cbar .nm{font-weight:800; font-size:15px}
+  .cbar .st{font-size:11px; opacity:.7}
+
+  /* 대화 영역 */
+  .chat{flex:1; padding:16px 14px 8px; display:flex; flex-direction:column; gap:10px; overflow-y:auto}
+  .row{display:flex; gap:8px; max-width:88%}
+  .row.bot{align-self:flex-start}
+  .row.me{align-self:flex-end; justify-content:flex-end}
+  .row.bot .ava{width:30px; height:30px; border-radius:9px; background:linear-gradient(135deg,#2563eb,#1e3a5f); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:15px}
+  .bubble{padding:10px 13px; border-radius:14px; font-size:14px; line-height:1.62; white-space:pre-line}
+  .bot .bubble{background:var(--bot); border-bottom-left-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,.06)}
+  .me .bubble{background:var(--me); border-bottom-right-radius:4px}
+  .bot .nm{font-size:11px; color:#475569; margin-bottom:3px; font-weight:700}
+  .bubble .dis{display:block; margin-top:7px; font-size:11px; color:#9ca3af}
+
+  /* 추천 질문 칩 */
+  .sugg{padding:6px 14px 12px; display:flex; gap:7px; flex-wrap:wrap; background:#b2c7d9}
+  .sugg .lbl{width:100%; font-size:11.5px; color:#3f5b73; font-weight:700; margin-bottom:2px}
+  .chip{background:#fff; border:1px solid #cbd5e1; border-radius:18px; padding:7px 12px; font-size:12.5px; cursor:pointer; color:#334155; transition:.12s}
+  .chip:hover{background:#eef2f7; border-color:#94a3b8}
+
+  /* 입력창 */
+  .inbar{display:flex; gap:8px; padding:10px 12px; background:#fff; border-top:1px solid var(--line); position:sticky; bottom:0}
+  .inbar input{flex:1; border:1px solid var(--line); border-radius:20px; padding:10px 14px; font-size:14px; outline:none}
+  .inbar button{background:var(--accent); color:#fff; border:none; border-radius:20px; padding:0 16px; font-weight:700; font-size:14px; cursor:pointer}
+  .demo-note{font-size:11px; color:#3f5b73; text-align:center; padding:4px 14px 0}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="cbar">
+    <div class="ava">📈</div>
+    <div><div class="nm">매크로 브리핑 봇</div><div class="st">오늘(6/11) 브리핑을 알고 있어요 · 보통 즉시 답장</div></div>
+  </div>
+
+  <div class="chat" id="chat">
+    <div class="row bot">
+      <div class="ava">📈</div>
+      <div><div class="nm">매크로 브리핑 봇</div>
+        <div class="bubble">안녕하세요! 오늘 시장은 <b>중동發 기름값 충격</b>으로 물가·금리 부담이 커진 '흐리고 비' 국면이에요. ☔
+궁금한 거 편하게 물어보세요. 아래 예시를 눌러봐도 좋아요 👇</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sugg" id="sugg">
+    <div class="lbl">💬 이런 걸 물어볼 수 있어요</div>
+    <div class="chip" onclick="ask('snp')">S&P에 물렸는데 더 사도 될까요?</div>
+    <div class="chip" onclick="ask('dollar')">지금 달러 사도 안 늦었나요?</div>
+    <div class="chip" onclick="ask('why')">환율이 왜 이렇게 올랐어요?</div>
+    <div class="chip" onclick="ask('gold')">금 지금 사도 돼요?</div>
+  </div>
+
+  <div class="inbar">
+    <input id="txt" placeholder="메시지 입력… (데모에선 위 예시를 눌러주세요)" onkeydown="if(event.key==='Enter')typed()">
+    <button onclick="typed()">전송</button>
+  </div>
+  <div class="demo-note">⚠️ 시안 데모입니다. 실제 버전은 클로드가 당신의 질문에 직접 답합니다.</div>
+
+</div>
+
+<script>
+const Q = {
+  snp: "S&P에 물렸는데 더 사도 될까요?",
+  dollar: "지금 달러 사도 안 늦었나요?",
+  why: "환율이 왜 이렇게 올랐어요?",
+  gold: "금 지금 사도 돼요?"
+};
+const A = {
+  snp: `지금 S&P는 '두 얼굴'이에요.
+• 길게 보면 → AI 투자 붐이 실적을 받쳐주는 건 강점 (JP모건은 향후 2년 이익 +13~15% 전망)
+• 짧게 보면 → 유가·금리 부담으로 출렁이는 구간
+
+물타기(추가 매수) 전에 스스로 3가지만 체크해보세요 👇
+① 투자 기간이 충분히 긴가? (1년 이상이면 단기 출렁임은 덜 중요)
+② 더 떨어져도 버틸 여유 자금인가?
+③ 한 번에 말고 나눠서 살 수 있나? (분할매수)
+
+셋 다 '예'라면 분할 접근은 합리적일 수 있어요. '지금 사라/팔라'는 정답은 없고, 본인 기준이 가장 중요합니다.`,
+  dollar: `환율이 이미 1,520원으로 꽤 높은 편이라, '지금 다 사기'는 부담스러운 자리예요.
+다만 불확실성이 큰 국면이라 달러를 '일부' 갖고 있는 건 방어 차원에서 의미가 있어요.
+
+추천 틀:
+• 한 번에 말고 → 몇 번에 나눠서 (환율이 더 오르든 내리든 평균을 맞춤)
+• 목적을 구분 → 단기 차익용이라면 신중, 장기 방어·분산용이라면 분할로
+지금은 '추격'보다 '분할·분산'이 어울리는 자리입니다.`,
+  why: `한마디로 '외국인이 한국을 떠나서'예요.
+흐름을 따라가 보면 👇
+중동 갈등 → 기름값 급등 → 미국 물가 3년래 최고 → 미국이 금리를 못 내림 → 미국 이자가 높으니 돈이 미국으로 → 외국인이 한국 주식 19일째 매도 → 달러 수요↑ → 환율↑
+
+즉 환율은 '원인'이 아니라 위 흐름의 '결과'예요. 그래서 외국인이 돌아오는 신호가 환율 안정의 열쇠입니다.`,
+  gold: `금은 지금 같은 '물가 불안 + 지정학 리스크' 국면의 교과서적 방어 자산이에요.
+• 각국 중앙은행이 4년째 금을 사 모으는 중 → 큰 손들이 받쳐주는 흐름
+• 다만 이미 많이 오른 점은 감안해야 해요
+
+추천 틀: 한 방에 크게 말고, 포트폴리오의 5~10% 정도를 '보험'처럼 분할로 담는 게 이런 국면의 정석이에요. 단기 차익보다 '분산·방어' 목적으로 보면 마음이 편합니다.`
+};
+
+const chat = document.getElementById('chat');
+function add(side, html){
+  const row = document.createElement('div');
+  row.className = 'row ' + side;
+  if(side==='bot'){
+    row.innerHTML = `<div class="ava">📈</div><div><div class="nm">매크로 브리핑 봇</div><div class="bubble">${html}<span class="dis">※ 참고용 의견이에요. 투자 판단·책임은 본인에게 있습니다.</span></div></div>`;
+  } else {
+    row.innerHTML = `<div class="bubble">${html}</div>`;
+  }
+  chat.appendChild(row);
+  chat.scrollTop = chat.scrollHeight;
+}
+function ask(key){
+  add('me', Q[key]);
+  setTimeout(()=>add('bot', A[key]), 450);
+}
+function typed(){
+  const t = document.getElementById('txt');
+  if(!t.value.trim()) return;
+  add('me', t.value.replace(/</g,'&lt;'));
+  t.value='';
+  setTimeout(()=>add('bot', "이건 시안 데모라 미리 준비된 예시 질문에만 답해요. 위의 추천 질문을 눌러보세요! 🙏<br>실제 버전에선 어떤 질문이든 오늘 브리핑을 바탕으로 답합니다."), 450);
+}
+</script>
+</body>
+</html>

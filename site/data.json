@@ -1,0 +1,132 @@
+{
+  "updated": "2026-06-11 18:36",
+  "market": {
+    "DXY": {
+      "id": 12,
+      "indicator": "DXY",
+      "value": 100.07,
+      "unit": "pt",
+      "timestamp": "2026-06-11",
+      "source": "yfinance",
+      "daily_change": 0.16
+    },
+    "GOLD": {
+      "id": 14,
+      "indicator": "GOLD",
+      "value": 4106.3,
+      "unit": "USD/온스",
+      "timestamp": "2026-06-11",
+      "source": "yfinance",
+      "daily_change": -0.05
+    },
+    "KOSDAQ": {
+      "id": 7,
+      "indicator": "KOSDAQ",
+      "value": 996.93,
+      "unit": "pt",
+      "timestamp": "2026-06-11",
+      "source": "yfinance",
+      "daily_change": 3.01
+    },
+    "KOSPI": {
+      "id": 6,
+      "indicator": "KOSPI",
+      "value": 7763.95,
+      "unit": "pt",
+      "timestamp": "2026-06-11",
+      "source": "yfinance",
+      "daily_change": -4.11
+    },
+    "NDX": {
+      "id": 9,
+      "indicator": "NDX",
+      "value": 25678.82,
+      "unit": "pt",
+      "timestamp": "2026-06-09",
+      "source": "yfinance",
+      "daily_change": -0.97
+    },
+    "SPX": {
+      "id": 8,
+      "indicator": "SPX",
+      "value": 7386.65,
+      "unit": "pt",
+      "timestamp": "2026-06-09",
+      "source": "yfinance",
+      "daily_change": -0.26
+    },
+    "US10Y": {
+      "id": 15,
+      "indicator": "US10Y",
+      "value": 4.53,
+      "unit": "%",
+      "timestamp": "2026-06-09",
+      "source": "yfinance",
+      "daily_change": -0.53
+    },
+    "USDKRW": {
+      "id": 11,
+      "indicator": "USDKRW",
+      "value": 1531.18,
+      "unit": "원",
+      "timestamp": "2026-06-11",
+      "source": "yfinance",
+      "daily_change": 0.35
+    },
+    "VIX": {
+      "id": 10,
+      "indicator": "VIX",
+      "value": 20.6,
+      "unit": "pt",
+      "timestamp": "2026-06-11",
+      "source": "yfinance",
+      "daily_change": 3.67
+    },
+    "WTI": {
+      "id": 13,
+      "indicator": "WTI",
+      "value": 89.56,
+      "unit": "USD/배럴",
+      "timestamp": "2026-06-11",
+      "source": "yfinance",
+      "daily_change": -0.52
+    },
+    "WTI유가": {
+      "id": 3,
+      "indicator": "WTI유가",
+      "value": 89.53,
+      "unit": "달러/배럴",
+      "timestamp": "2026-06-11 18:27:13",
+      "source": "yfinance",
+      "daily_change": null
+    },
+    "금선물": {
+      "id": 4,
+      "indicator": "금선물",
+      "value": 4107.7,
+      "unit": "달러/온스",
+      "timestamp": "2026-06-11 18:27:13",
+      "source": "yfinance",
+      "daily_change": null
+    },
+    "미국채10년물금리": {
+      "id": 5,
+      "indicator": "미국채10년물금리",
+      "value": 4.53,
+      "unit": "%",
+      "timestamp": "2026-06-11 18:27:13",
+      "source": "yfinance",
+      "daily_change": null
+    },
+    "원달러환율": {
+      "id": 2,
+      "indicator": "원달러환율",
+      "value": 1531.57,
+      "unit": "원",
+      "timestamp": "2026-06-11 18:27:12",
+      "source": "yfinance",
+      "daily_change": null
+    }
+  },
+  "latest_briefing_id": "daily-2026-06-11"
+}

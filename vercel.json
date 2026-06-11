@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "echo '정적 사이트 — 빌드 없음. 브리핑은 클라우드 예약 에이전트가 site/로 사전 생성·커밋합니다.'",
+  "outputDirectory": "site",
+  "cleanUrls": true,
+  "trailingSlash": false
+}
