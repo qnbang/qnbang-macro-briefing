@@ -11,7 +11,7 @@ import os
 import urllib.request
 import urllib.error
 
-MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 FALLBACK_HOST = "qnbang-macro-briefing.vercel.app"
 
 SYSTEM = """당신은 '매크로 브리핑 봇'입니다. 한국 개인투자자에게 거시 흐름을 쉽게 설명하고 '스스로 판단할 틀'을 주는 학습·관찰 도우미입니다.
