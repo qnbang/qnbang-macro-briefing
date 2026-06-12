@@ -7,8 +7,11 @@ __pycache__/
 .vercel/
 .DS_Store
 .env
+.env.local
+.env.production
 *.log
 
 # 디자인 시안(작업용 원본 — 배포 대상 아님)
 # site/ 와 macro_briefing.db 는 '추적'한다(배포·이력의 원천이므로 무시하지 않음)
 .vercel
+.env*
