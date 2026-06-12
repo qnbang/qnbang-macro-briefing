@@ -28,7 +28,7 @@ import fetch_market
 import store_briefing
 import build_site
 
-MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+MODEL = os.environ.get("GEMINI_MODEL", "gemini-1.5-pro")
 
 SYSTEM_INSTRUCTION = """당신은 금융/경제 전문 AI 에디터입니다. 오늘의 시장 가격 지표와 구글 검색을 활용한 최신 매크로 분석을 바탕으로, 한국 개인투자자를 위한 '매크로 투자 브리핑' 기사를 작성하는 것이 임무입니다.
 
