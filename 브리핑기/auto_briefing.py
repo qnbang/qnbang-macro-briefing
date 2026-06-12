@@ -209,41 +209,71 @@ def extract_json(text):
 
 
 def ask_gemini(api_key, prompt):
-    """Google Gemini API 호출 (Google Search Grounding 활성화)"""
-    payload = {
-        "system_instruction": {"parts": [{"text": SYSTEM_INSTRUCTION}]},
-        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-        "tools": [{"google_search": {}}],
-        "generationConfig": {
-            "temperature": 0.2,
-        },
-    }
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={api_key}"
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"content-type": "application/json"},
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            data = json.loads(resp.read().decode())
-    except urllib.error.HTTPError as e:
-        print("[에러] Gemini API HTTP 에러 발생!")
-        print(f"상태 코드: {e.code}")
-        try:
-            err_detail = e.read().decode()
-            print(f"상태 세부내용:\n{err_detail}")
-        except Exception as read_err:
-            print(f"에러 세부내용 읽기 실패: {read_err}")
-        raise e
+    """Google Gemini API 호출 (Google Search Grounding 활성화, 재시도 및 Fallback 지원)"""
+    import time
     
-    candidates = data.get("candidates", [])
-    if not candidates:
-        raise ValueError("Gemini API가 빈 응답을 반환했습니다.")
-    
-    parts = candidates[0].get("content", {}).get("parts", [])
-    text = "".join(p.get("text", "") for p in parts).strip()
-    return text
+    # 시도할 모델 순서: 기본 모델 -> gemini-1.5-flash fallback
+    models_to_try = [MODEL]
+    if MODEL != "gemini-1.5-flash":
+        models_to_try.append("gemini-1.5-flash")
+        
+    for current_model in models_to_try:
+        max_retries = 3
+        for attempt in range(1, max_retries + 1):
+            payload = {
+                "system_instruction": {"parts": [{"text": SYSTEM_INSTRUCTION}]},
+                "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+                "tools": [{"google_search": {}}],
+                "generationConfig": {
+                    "temperature": 0.2,
+                },
+            }
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{current_model}:generateContent?key={api_key}"
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"content-type": "application/json"},
+            )
+            print(f"[정보] Gemini API 호출 시도 ({current_model}) - 시도 {attempt}/{max_retries}")
+            try:
+                with urllib.request.urlopen(req, timeout=120) as resp:
+                    data = json.loads(resp.read().decode())
+                
+                candidates = data.get("candidates", [])
+                if not candidates:
+                    raise ValueError("Gemini API가 빈 응답을 반환했습니다.")
+                
+                parts = candidates[0].get("content", {}).get("parts", [])
+                text = "".join(p.get("text", "") for p in parts).strip()
+                return text
+                
+            except urllib.error.HTTPError as e:
+                print(f"[경고] Gemini API HTTP 에러 발생 (모델: {current_model}, 상태 코드: {e.code})")
+                try:
+                    err_detail = e.read().decode()
+                    print(f"상태 세부내용:\n{err_detail}")
+                except Exception as read_err:
+                    print(f"에러 세부내용 읽기 실패: {read_err}")
+                
+                # 429(Too Many Requests) 또는 503(Service Unavailable) 또는 500 등 일시적인 오류인 경우 재시도
+                if e.code in [429, 500, 503, 504]:
+                    if attempt < max_retries:
+                        sleep_time = attempt * 5
+                        print(f"{sleep_time}초 후 재시도합니다...")
+                        time.sleep(sleep_time)
+                        continue
+                # 일시적이지 않은 오류는 즉시 루프 탈출하여 다음 모델로 넘어가거나 예외 발생
+                break
+            except Exception as e:
+                print(f"[경고] 일반 예외 발생: {e}")
+                if attempt < max_retries:
+                    sleep_time = attempt * 5
+                    print(f"{sleep_time}초 후 재시도합니다...")
+                    time.sleep(sleep_time)
+                    continue
+                break
+                
+    raise RuntimeError("모든 모델 시도 및 재시도 끝에 Gemini API 호출에 실패했습니다.")
 
 
 def run():
