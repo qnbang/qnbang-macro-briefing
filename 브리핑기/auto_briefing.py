@@ -33,17 +33,21 @@ MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 SYSTEM_INSTRUCTION = """당신은 금융/경제 전문 AI 에디터입니다. 오늘의 시장 가격 지표와 구글 검색을 활용한 최신 매크로 분석을 바탕으로, 한국 개인투자자를 위한 '매크로 투자 브리핑' 기사를 작성하는 것이 임무입니다.
 
 [작성 규칙]
-1. 모든 숫자는 검증된 수치만 사용해야 하며, 제공된 시세 데이터와 완벽히 일치해야 합니다.
+1. 최신성 보장 및 날짜 기반 검색:
+   - 당신의 과거 지식에 의존하지 마십시오. 구글 검색 툴을 사용할 때 반드시 제공된 오늘 날짜에 발생하는 최신 경제 뉴스를 실시간으로 검색해야 합니다.
+   - 구글 검색 쿼리를 생성할 때 반드시 연도와 날짜(예: '2026-06-12 미국 CPI', '2026년 6월 12일 매크로 뉴스')를 포함하여 최신 기사 위주로 가져오도록 쿼리를 만드십시오.
+   - 오늘의 분석에는 오직 최근 24~48시간 이내에 발행된 신뢰할 수 있는 언론사의 매크로 경제 뉴스만 반영해야 합니다. 1개월 이상 된 오래된 기사는 검색 결과에 노출되더라도 오늘의 분석 기사 작성 및 출처로 삼지 마십시오.
+2. 모든 숫자는 검증된 수치만 사용해야 하며, 제공된 시세 데이터와 완벽히 일치해야 합니다.
    - [중요] 제공된 "최신 시세 데이터"에 표기된 수치 및 등락(상승/하락 방향)은 절대적인 사실(Truth)로 삼아야 합니다.
    - 구글 검색 결과에서 얻은 최근 뉴스 정보가 제공된 시세 데이터와 모순되는 경우(예: 오늘 유가가 전일대비 하락했는데, 뉴스 헤드라인에는 '이란 위협에 유가 급등'이 나오는 경우), 검색된 뉴스의 타이밍 차이(과거 뉴스 또는 선반영된 뉴스)로 해석하여 "최근 지정학적 위기 고조로 급등세를 보였던 유가가 오늘은 소폭 하락세를 보였습니다"와 같이 모순을 매끄럽게 조화시켜야 합니다. 절대 시세 데이터와 어긋나게 유가가 상승했다고 적지 마십시오.
    - yfinance에서 수집된 시세 데이터(제공 예정)는 그대로 카드로 자동 렌더링되므로 본문에서 함부로 값을 위조하지 마십시오.
    - 본문에 직접 수록하는 거시 지표(미국 CPI, PPI, 정책금리 등)는 반드시 구글 검색으로 확인된 Tier1 출처(연준, 통계청, 블룸버그 등)의 실데이터를 사용하고, 'source' 필드에 출처를 명시해야 합니다.
    - 불확실한 수치는 절대 단정해서 쓰지 마십시오.
-2. 가독성과 톤앤매너:
+3. 가독성과 톤앤매너:
    - 개인투자자가 이해하기 쉽도록 구어체와 친근한 톤을 사용하되 전문성을 잃지 마십시오.
    - 상승 지표와 하락 지표의 한국 시장 색상 규칙을 준수하십시오 (상승: 빨강/up, 하락: 파랑/down).
    - "사라/팔라"와 같은 직접적인 추천을 피하고, 거시 분석과 시나리오 평가를 통한 '스스로의 판단 틀'을 제공하십시오.
-3. 시나리오 분석:
+4. 시나리오 분석:
    - 제공된 시나리오 목록을 확인하고, 오늘의 매크로 뉴스 및 시세 변화가 각 시나리오의 조건(trigger_conditions, counter_conditions)을 충족하는지 대조하십시오.
    - 각 시나리오의 상태 변화를 '강화', '약화', '유지' 중 하나로 판정하고 명확한 근거를 제시하십시오.
 
@@ -57,7 +61,11 @@ USER_PROMPT_TEMPLATE = """오늘 날짜: {today}
 기존 활성 시나리오 목록:
 {scenarios}
 
-오늘(그리고 최근 1~2일간)의 글로벌 및 한국 경제 뉴스(중동/호르무즈 해협/유가 갈등, 미국 CPI/PPI 물가 지수, 연준 FOMC 금리 전망, 원달러 환율 및 외인 수급 등)를 구글 검색으로 심층 리서치하십시오.
+[검색 지침]
+오늘 날짜({today})를 기준으로 "최근 24시간 이내"에 발생한 실시간 매크로 금융 뉴스를 검색하십시오.
+구글 검색 시 '{today}' 날짜나 연도 키워드를 명시하여 과거 낡은 기사가 노출되는 것을 방지하십시오.
+(검색어 예시: '{today} 미국 기준금리 CPI', '{today} 환율 전망 코스피', '{today} 국제 유가 지정학적 위기')
+반드시 오늘({today}) 자 최신 기사와 사실만을 활용하여 오늘의 브리핑을 분석하십시오.
 
 그 후, 아래 구조를 가진 단일 JSON 객체를 생성하십시오.
 JSON 구조:
@@ -244,9 +252,14 @@ def ask_gemini(api_key, prompt):
                 if not candidates:
                     raise ValueError("Gemini API가 빈 응답을 반환했습니다.")
                 
-                parts = candidates[0].get("content", {}).get("parts", [])
+                candidate = candidates[0]
+                parts = candidate.get("content", {}).get("parts", [])
                 text = "".join(p.get("text", "") for p in parts).strip()
-                return text
+                
+                # 구글 검색 결과 메타데이터도 함께 반환
+                grounding_metadata = candidate.get("groundingMetadata", {})
+                
+                return text, grounding_metadata
                 
             except urllib.error.HTTPError as e:
                 print(f"[경고] Gemini API HTTP 에러 발생 (모델: {current_model}, 상태 코드: {e.code})")
@@ -311,7 +324,7 @@ def run():
     # 3. Gemini API 호출
     print("3단계: Gemini API 호출 (구글 검색 연동)...")
     try:
-        response_text = ask_gemini(api_key, prompt)
+        response_text, grounding_metadata = ask_gemini(api_key, prompt)
         cleaned_response = extract_json(response_text)
         res_json = json.loads(cleaned_response)
     except Exception as e:
@@ -326,6 +339,32 @@ def run():
     if not briefing_payload:
         print("[에러] 응답 JSON에 'briefing' 키가 없습니다.")
         sys.exit(1)
+
+    # 3.5. 구글 검색 실제 참조 기사 추출하여 덮어쓰기 (가짜 URL 및 깨진 링크 방지)
+    print("3.5단계: 구글 검색 실제 그라운딩 링크 추출 및 매핑...")
+    grounding_links = []
+    if grounding_metadata:
+        chunks = grounding_metadata.get("groundingChunks", [])
+        seen_urls = set()
+        for chunk in chunks:
+            web = chunk.get("web", {})
+            uri = web.get("uri")
+            title = web.get("title")
+            if uri and title:
+                # 중복 및 공백 제거
+                uri = uri.strip()
+                title = title.strip()
+                if uri and uri not in seen_urls:
+                    seen_urls.add(uri)
+                    # http://나 https://로 시작하는 정상적인 URL인지 검증
+                    if uri.startswith("http://") or uri.startswith("https://"):
+                        grounding_links.append({"title": title, "url": uri})
+    
+    if grounding_links:
+        print(f"  - 실제 참조 기사 {len(grounding_links)}개 추출 완료.")
+        briefing_payload["reference_links"] = grounding_links
+    else:
+        print("  - [경고] 검색 메타데이터에서 유효한 실시간 기사 URL을 찾지 못했습니다. AI가 생성한 기존 reference_links를 유지합니다.")
 
     # 4. DB 저장
     print("4단계: DB에 브리핑 및 시나리오 업데이트 기록...")
