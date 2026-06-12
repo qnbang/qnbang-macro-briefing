@@ -1,17 +1,17 @@
 {
-  "updated": "2026-06-12 06:45",
+  "updated": "2026-06-12 06:49",
   "market": {
     "DXY": {
-      "id": 72,
+      "id": 82,
       "indicator": "DXY",
       "value": 99.81,
       "unit": "pt",
       "timestamp": "2026-06-12",
       "source": "yfinance",
-      "daily_change": -0.06
+      "daily_change": -0.05
     },
     "GOLD": {
-      "id": 74,
+      "id": 84,
       "indicator": "GOLD",
       "value": 4198.2,
       "unit": "USD/온스",
@@ -20,7 +20,7 @@
       "daily_change": 2.64
     },
     "KOSDAQ": {
-      "id": 67,
+      "id": 77,
       "indicator": "KOSDAQ",
       "value": 1024.26,
       "unit": "pt",
@@ -29,7 +29,7 @@
       "daily_change": 2.74
     },
     "KOSPI": {
-      "id": 66,
+      "id": 76,
       "indicator": "KOSPI",
       "value": 8135.82,
       "unit": "pt",
@@ -38,7 +38,7 @@
       "daily_change": 4.79
     },
     "NDX": {
-      "id": 69,
+      "id": 79,
       "indicator": "NDX",
       "value": 25809.66,
       "unit": "pt",
@@ -47,7 +47,7 @@
       "daily_change": 2.54
     },
     "SPX": {
-      "id": 68,
+      "id": 78,
       "indicator": "SPX",
       "value": 7394.3,
       "unit": "pt",
@@ -56,7 +56,7 @@
       "daily_change": 1.75
     },
     "US10Y": {
-      "id": 75,
+      "id": 85,
       "indicator": "US10Y",
       "value": 4.46,
       "unit": "%",
@@ -65,16 +65,16 @@
       "daily_change": -1.74
     },
     "USDKRW": {
-      "id": 71,
+      "id": 81,
       "indicator": "USDKRW",
-      "value": 1520.18,
+      "value": 1519.54,
       "unit": "원",
       "timestamp": "2026-06-12",
       "source": "yfinance",
-      "daily_change": -0.32
+      "daily_change": -0.36
     },
     "VIX": {
-      "id": 70,
+      "id": 80,
       "indicator": "VIX",
       "value": 19.44,
       "unit": "pt",
@@ -83,13 +83,13 @@
       "daily_change": -12.51
     },
     "WTI": {
-      "id": 73,
+      "id": 83,
       "indicator": "WTI",
-      "value": 85.91,
+      "value": 85.81,
       "unit": "USD/배럴",
       "timestamp": "2026-06-12",
       "source": "yfinance",
-      "daily_change": -2.05
+      "daily_change": -2.17
     },
     "WTI유가": {
       "id": 3,
