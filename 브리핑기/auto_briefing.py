@@ -192,14 +192,23 @@ def get_scenarios(conn):
     return "\n\n".join(scenarios_list)
 
 
+def extract_json(text):
+    """텍스트에서 마크다운 JSON 블록을 벗겨내고 순수 JSON 문자열만 반환"""
+    text = text.strip()
+    if "```json" in text:
+        text = text.split("```json")[1].split("```")[0].strip()
+    elif "```" in text:
+        text = text.split("```")[1].split("```")[0].strip()
+    return text
+
+
 def ask_gemini(api_key, prompt):
-    """Google Gemini API 호출 (Google Search Grounding 활성화 및 JSON 출력 강제)"""
+    """Google Gemini API 호출 (Google Search Grounding 활성화)"""
     payload = {
         "system_instruction": {"parts": [{"text": SYSTEM_INSTRUCTION}]},
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
         "tools": [{"google_search": {}}],
         "generationConfig": {
-            "responseMimeType": "application/json",
             "temperature": 0.2,
         },
     }
@@ -265,11 +274,12 @@ def run():
     print("3단계: Gemini API 호출 (구글 검색 연동)...")
     try:
         response_text = ask_gemini(api_key, prompt)
-        res_json = json.loads(response_text)
+        cleaned_response = extract_json(response_text)
+        res_json = json.loads(cleaned_response)
     except Exception as e:
         print(f"[에러] Gemini 호출 또는 JSON 파싱 중 오류 발생: {e}")
         if 'response_text' in locals():
-            print(f"응답 텍스트 일부: {response_text[:500]}")
+            print(f"응답 텍스트 일부: {response_text[:1000]}")
         sys.exit(1)
 
     briefing_payload = res_json.get("briefing")
