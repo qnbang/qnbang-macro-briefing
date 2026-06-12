@@ -212,10 +212,11 @@ def ask_gemini(api_key, prompt):
     """Google Gemini API 호출 (Google Search Grounding 활성화, 재시도 및 Fallback 지원)"""
     import time
     
-    # 시도할 모델 순서: 기본 모델 -> gemini-1.5-flash fallback
+    # 시도할 모델 순서: 기본 모델 -> gemini-2.5-flash-lite -> gemini-2.0-flash -> gemini-flash-latest
     models_to_try = [MODEL]
-    if MODEL != "gemini-1.5-flash":
-        models_to_try.append("gemini-1.5-flash")
+    for fallback in ["gemini-2.5-flash-lite", "gemini-2.0-flash", "gemini-flash-latest"]:
+        if fallback != MODEL and fallback not in models_to_try:
+            models_to_try.append(fallback)
         
     for current_model in models_to_try:
         max_retries = 3
@@ -258,7 +259,8 @@ def ask_gemini(api_key, prompt):
                 # 429(Too Many Requests) 또는 503(Service Unavailable) 또는 500 등 일시적인 오류인 경우 재시도
                 if e.code in [429, 500, 503, 504]:
                     if attempt < max_retries:
-                        sleep_time = attempt * 5
+                        # 429인 경우 대기시간을 더 길게(시도차수 * 15초) 적용하여 Rate Limit 우회 시도
+                        sleep_time = attempt * 15 if e.code == 429 else attempt * 5
                         print(f"{sleep_time}초 후 재시도합니다...")
                         time.sleep(sleep_time)
                         continue

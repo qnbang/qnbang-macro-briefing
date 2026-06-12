@@ -34,7 +34,6 @@ jobs:
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       run: |
-        python 브리핑기/list_models.py
         python 브리핑기/auto_briefing.py
 
     - name: Commit and Push changes
