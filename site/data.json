@@ -1,44 +1,44 @@
 {
-  "updated": "2026-06-12 13:46",
+  "updated": "2026-06-12 05:20",
   "market": {
     "DXY": {
-      "id": 22,
+      "id": 42,
       "indicator": "DXY",
-      "value": 99.81,
+      "value": 99.78,
       "unit": "pt",
-      "timestamp": "2026-06-11",
+      "timestamp": "2026-06-12",
       "source": "yfinance",
-      "daily_change": -0.14
+      "daily_change": -0.08
     },
     "GOLD": {
-      "id": 24,
+      "id": 44,
       "indicator": "GOLD",
-      "value": 4216.9,
+      "value": 4207.1,
       "unit": "USD/온스",
-      "timestamp": "2026-06-11",
+      "timestamp": "2026-06-12",
       "source": "yfinance",
-      "daily_change": 2.65
+      "daily_change": 2.86
     },
     "KOSDAQ": {
-      "id": 17,
+      "id": 37,
       "indicator": "KOSDAQ",
-      "value": 1042.16,
+      "value": 1049.51,
       "unit": "pt",
       "timestamp": "2026-06-12",
       "source": "yfinance",
-      "daily_change": 4.54
+      "daily_change": 5.27
     },
     "KOSPI": {
-      "id": 16,
+      "id": 36,
       "indicator": "KOSPI",
-      "value": 8386.48,
+      "value": 8422.88,
       "unit": "pt",
       "timestamp": "2026-06-12",
       "source": "yfinance",
-      "daily_change": 8.02
+      "daily_change": 8.49
     },
     "NDX": {
-      "id": 19,
+      "id": 39,
       "indicator": "NDX",
       "value": 25809.66,
       "unit": "pt",
@@ -47,7 +47,7 @@
       "daily_change": 2.54
     },
     "SPX": {
-      "id": 18,
+      "id": 38,
       "indicator": "SPX",
       "value": 7394.3,
       "unit": "pt",
@@ -56,7 +56,7 @@
       "daily_change": 1.75
     },
     "US10Y": {
-      "id": 25,
+      "id": 45,
       "indicator": "US10Y",
       "value": 4.46,
       "unit": "%",
@@ -65,16 +65,16 @@
       "daily_change": -1.74
     },
     "USDKRW": {
-      "id": 21,
+      "id": 41,
       "indicator": "USDKRW",
-      "value": 1521.64,
+      "value": 1519.88,
       "unit": "원",
       "timestamp": "2026-06-12",
       "source": "yfinance",
-      "daily_change": -0.22
+      "daily_change": -0.34
     },
     "VIX": {
-      "id": 20,
+      "id": 40,
       "indicator": "VIX",
       "value": 19.44,
       "unit": "pt",
@@ -83,13 +83,13 @@
       "daily_change": -12.51
     },
     "WTI": {
-      "id": 23,
+      "id": 43,
       "indicator": "WTI",
-      "value": 86.86,
+      "value": 85.98,
       "unit": "USD/배럴",
-      "timestamp": "2026-06-11",
+      "timestamp": "2026-06-12",
       "source": "yfinance",
-      "daily_change": -3.52
+      "daily_change": -1.97
     },
     "WTI유가": {
       "id": 3,
