@@ -209,8 +209,18 @@ def ask_gemini(api_key, prompt):
         data=json.dumps(payload).encode("utf-8"),
         headers={"content-type": "application/json"},
     )
-    with urllib.request.urlopen(req, timeout=120) as resp:
-        data = json.loads(resp.read().decode())
+    try:
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            data = json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        print("[에러] Gemini API HTTP 에러 발생!")
+        print(f"상태 코드: {e.code}")
+        try:
+            err_detail = e.read().decode()
+            print(f"상태 세부내용:\n{err_detail}")
+        except Exception as read_err:
+            print(f"에러 세부내용 읽기 실패: {read_err}")
+        raise e
     
     candidates = data.get("candidates", [])
     if not candidates:
