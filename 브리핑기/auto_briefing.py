@@ -253,8 +253,13 @@ def ask_gemini(api_key, prompt):
                     raise ValueError("Gemini API가 빈 응답을 반환했습니다.")
                 
                 candidate = candidates[0]
+                finish_reason = candidate.get("finishReason")
                 parts = candidate.get("content", {}).get("parts", [])
                 text = "".join(p.get("text", "") for p in parts).strip()
+                
+                # 생성된 텍스트가 완전히 비어 있으면 예외 처리하여 재시도/우회 유도
+                if not text:
+                    raise ValueError(f"Gemini API 응답 텍스트가 비어 있습니다. (finishReason: {finish_reason})")
                 
                 # 구글 검색 결과 메타데이터도 함께 반환
                 grounding_metadata = candidate.get("groundingMetadata", {})
