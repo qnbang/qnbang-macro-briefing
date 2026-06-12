@@ -296,6 +296,15 @@ def render_briefing(c, brow, market, is_archive=False, with_chat=False):
     )
     terms_block = f'<details><summary>📖 어려운 말 풀이 (펼치기)</summary>{terms}</details>' if terms else ""
 
+    ref_block = ""
+    if b.get("reference_links"):
+        refs = []
+        for r in b["reference_links"]:
+            refs.append(
+                f'<li><a href="{esc(r.get("url",""))}" target="_blank" rel="noopener noreferrer" style="color:var(--down);text-decoration:none;font-weight:600;">{esc(r.get("title",""))}</a></li>'
+            )
+        ref_block = f'<div class="sec">🔗 참고 기사 및 출처</div><ul class="bullets" style="margin-top:5px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 15px 10px 30px;">{"".join(refs)}</ul>'
+
     src = f'<div class="src">📌 {esc(b.get("sources",""))}</div>'
     disc = (
         '<div class="disc">본 자료는 거시 흐름 학습·관찰용이며 투자 자문이나 매매 권유가 아닙니다.<br>'
@@ -305,7 +314,7 @@ def render_briefing(c, brow, market, is_archive=False, with_chat=False):
           '<div class="nav"><a href="/archive">📚 지난 브리핑 보기</a></div>'
 
     body = (head + weather + plain + stance + twocol + views + ind_sec + full_mkt
-            + flow_sec + weekly + monthly + scn_sec + terms_block + src + nav + disc)
+            + flow_sec + weekly + monthly + scn_sec + terms_block + ref_block + src + nav + disc)
     if with_chat:
         body += CHAT_WIDGET
     return page(body, f"매크로 브리핑 — {date_str}")
