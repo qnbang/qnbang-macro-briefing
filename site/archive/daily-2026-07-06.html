@@ -1,0 +1,91 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>매크로 브리핑 — 2026-07-06</title>
+<style>
+:root{--up:#e0392b;--down:#1f6fd6;--ink:#1a1d21;--sub:#6b7280;--line:#e9ebef;--bg:#f4f6f9;--card:#fff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:18px 16px 60px}
+.top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+.brand{font-weight:800;font-size:18px;letter-spacing:-.3px}
+.date{color:var(--sub);font-size:13px}
+.date a,.nav a{color:var(--down);text-decoration:none;font-weight:700}
+.weather{background:linear-gradient(135deg,#374151,#1f2937);color:#fff;border-radius:20px;padding:20px 22px;display:flex;align-items:center;gap:18px;box-shadow:0 8px 24px rgba(31,41,55,.18)}
+.weather .emoji{font-size:52px;line-height:1}
+.weather .label{font-size:12px;opacity:.75;letter-spacing:2px}
+.weather .state{font-size:24px;font-weight:800;margin:2px 0}
+.weather .desc{font-size:13.5px;opacity:.9}
+.plain{background:#fff7e6;border:1px solid #ffe2a8;border-radius:16px;padding:15px 18px;margin-top:13px}
+.plain h3{font-size:13px;color:#b7791f;margin-bottom:5px;font-weight:700}
+.plain p{font-size:15px;font-weight:500}
+.sec{margin:26px 0 12px;font-size:15px;font-weight:800;color:#374151;letter-spacing:-.2px}
+.sec small{font-weight:500;color:var(--sub);margin-left:6px;font-size:12.5px}
+.stance{background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;border-radius:18px;padding:18px 20px;box-shadow:0 6px 20px rgba(37,99,235,.22)}
+.stance .k{font-size:12px;opacity:.8;letter-spacing:1px}
+.stance .t{font-size:18px;font-weight:800;margin:4px 0 2px;line-height:1.4}
+.stance .s{font-size:13.5px;opacity:.92}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:11px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px}
+.box.up-b{border-top:3px solid var(--up)}.box.dn-b{border-top:3px solid var(--down)}
+.box h4{font-size:13px;margin-bottom:7px}.box.up-b h4{color:var(--up)}.box.dn-b h4{color:var(--down)}
+.box li{font-size:12.5px;color:#4b5563;list-style:none;padding:3px 0 3px 14px;position:relative}
+.box li:before{content:"•";position:absolute;left:2px;color:#cbd1da}
+.view{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;display:flex;align-items:flex-start;gap:12px;margin-top:9px}
+.badge{flex-shrink:0;font-size:11.5px;font-weight:800;padding:4px 10px;border-radius:20px;margin-top:2px;white-space:nowrap}
+.b-good{background:#dcfce7;color:#15803d}.b-warn{background:#fef3c7;color:#b45309}.b-bad{background:#fee2e2;color:#b91c1c}.b-neu{background:#f1f5f9;color:#475569}
+.view .vname{font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:7px}
+.view .horizon{font-size:10.5px;font-weight:700;color:#64748b;background:#f1f5f9;border-radius:5px;padding:1px 6px}
+.view .vwhy{font-size:12.5px;color:#5b6473;margin-top:3px}
+.view .vhow{font-size:12px;color:#475569;margin-top:5px;background:#f8fafc;border-radius:8px;padding:6px 9px}
+.view .vhow b{color:var(--ink)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ind{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px}
+.ind .name{font-size:12.5px;color:var(--sub)}
+.ind .val{font-size:20px;font-weight:800;margin:2px 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.chg{font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:20px}
+.up{color:var(--up)}.down{color:var(--down)}
+.chg.up{background:#fde8e6;color:var(--up)}.chg.down{background:#e6f0fb;color:var(--down)}
+.ind .mean{font-size:12px;color:#4b5563;margin-top:6px;border-top:1px dashed var(--line);padding-top:7px}
+.csrc{display:block;font-size:10.5px;color:#aab1bd;margin-top:5px}
+.mqgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.mq{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:9px 11px;display:flex;flex-direction:column;gap:2px}
+.mqn{font-size:11.5px;color:var(--sub)}.mqv{font-size:15px;font-weight:800}
+.hflow{display:flex;gap:0;overflow-x:auto;padding:2px 2px 10px;-webkit-overflow-scrolling:touch}
+.hstep{flex:0 0 auto;width:158px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px}
+.hstep .tag{font-size:10.5px;font-weight:800;color:#fff;background:#374151;border-radius:6px;padding:1px 7px}
+.hstep .tag.kr{background:var(--up)}
+.hstep b{font-size:14px;display:block;margin-top:7px}
+.hstep p{font-size:11.5px;color:#6b7280;margin-top:3px}
+.harrow{flex:0 0 auto;display:flex;align-items:center;color:#cbd1da;font-size:20px;padding:0 5px}
+.shift{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap}
+.shift .from,.shift .to{text-align:center;flex:1;min-width:120px}
+.shift .k{font-size:11px;color:var(--sub)}
+.shift .v{font-size:14.5px;font-weight:800;margin-top:3px}
+.shift .from .v{color:#94a3b8}.shift .to .v{color:var(--up)}
+.shift .mid{font-size:24px;color:#cbd1da}
+.bullets{margin-top:10px}
+.bullets li{font-size:13px;color:#4b5563;list-style:none;padding:4px 0 4px 16px;position:relative}
+.bullets li:before{content:"→";position:absolute;left:0;color:#cbd1da}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.chips.scn .chip{font-size:11.5px}
+.chip{font-size:12px;font-weight:700;padding:5px 11px;border-radius:20px;border:1px solid var(--line);background:#fff}
+.chip .dot{font-weight:800;margin-right:3px}
+.chip.str{color:var(--up);border-color:#f6cdc9}.chip.str .dot{color:var(--up)}
+.chip.weak{color:var(--down);border-color:#cfe0f5}.chip.weak .dot{color:var(--down)}
+.chip.watch{color:#b45309;border-color:#fde68a}
+.theme{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.theme .tt{font-size:16px;font-weight:800;margin-bottom:7px}
+.theme p{font-size:13.5px;color:#4b5563}
+details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 16px;margin-top:12px}
+summary{font-size:13.5px;font-weight:700;cursor:pointer;padding:10px 0;color:#374151}
+.term{padding:8px 0;border-top:1px dashed var(--line);font-size:13px}
+.term b{color:var(--ink)}.term span{color:#6b7280}
+.nav{margin-top:20px;text-align:center;font-size:13.5px}
+.src{margin-top:18px;font-size:11.5px;color:#9ca3af}
+.disc{margin-top:14px;font-size:11.5px;color:#9ca3af;text-align:center;line-height:1.7}
+.arclist{display:flex;flex-direction:column;gap:9px}
+.arow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px;text-decoration:none;color:var(--ink)}
+.arow .ad{font-size:12.5px;color:var(--sub);white-space:nowrap}
+.arow .ap{font-size:11px;font-weight:800;color:var(--down);background:#eef4fd;border-radius:6px;padding:2px 7px;white-space:nowrap}
+.arow .at{font-size:13.5px;font-weight:600}
+</style></head><body><div class="wrap"><div class="top"><div class="brand">📈 매크로 브리핑</div><div class="date">2026년 7월 6일 (월) · 데일리 시그널</div></div><div class="weather"><div class="emoji">🌤️</div><div><div class="label">오늘의 시장 날씨</div><div class="state">대체로 맑음</div><div class="desc">글로벌 금융시장은 금값 급등과 원/달러 환율 하락이라는 상반된 흐름 속에서 혼조세를 보였습니다. 안전자산 선호 심리가 부각되는 모습입니다.</div></div></div><div class="plain"><h3>🗣️ 쉽게 말하면</h3><p>오늘 시장은 <b>금 가격의 가파른 상승</b>과 <b>원/달러 환율의 하락</b>이 두드러졌습니다. 금 가격은 온스당 4203.5달러까지 오르며 안전자산으로서의 매력을 한껏 발산했습니다. 반면, 원/달러 환율은 1529.03원으로 하락하며 원화 강세 기조를 이어갔습니다. 이러한 흐름 속에서 국내 증시인 코스피와 코스닥은 소폭 상승 마감했지만, 미국 나스닥 지수는 하락하며 대조를 보였습니다. 미국 10년물 국채 금리는 소폭 상승했으며, VIX 공포지수는 하락하며 시장의 변동성이 다소 완화되었음을 시사합니다. 국제 유가(WTI)는 소폭 하락세를 기록했습니다.</p></div><div class="sec">🧭 지금, 어떻게 투자할까 <small>참고용 의견 · 종목 추천 아님</small></div><div class="stance"><div class="k">한 줄 결론</div><div class="t">안전자산으로의 쏠림 현상 주시하며 신중한 접근 필요</div><div class="s">금 가격 급등과 원화 강세가 나타나고 있지만, 미국 증시의 약세와 유가 하락 등 상반된 지표들이 혼재되어 있어 투자 전략 수립에 신중을 기해야 합니다.</div></div><div class="twocol"><div class="box up-b"><h4>⬆️ 비중 늘려 둘 것</h4><li>금 관련 ETF</li><li>원화 강세 수혜주</li></div><div class="box dn-b"><h4>⬇️ 줄이거나 미룰 것</h4><li>달러 자산</li><li>국제 유가 관련 상품</li></div></div><div class="view"><span class="badge b-good">유리</span><div><div class="vname">금·안전자산 <span class="horizon">단기</span></div><div class="vwhy">미국 실질금리 하락 가능성과 지정학적 불확실성 증대 시 안전자산 선호 심리가 강화될 수 있습니다. 특히 금 가격의 최근 급등세는 이러한 흐름을 뒷받침합니다.</div><div class="vhow"><b>어떻게:</b> 금 현물 또는 금 관련 ETF 투자를 고려해 볼 수 있습니다. 다만, 급등에 따른 단기 차익 실현 매물 출현 가능성도 염두에 두어야 합니다.</div></div></div><div class="view"><span class="badge b-good">유리</span><div><div class="vname">한국 주식(지수) <span class="horizon">중기</span></div><div class="vwhy">원/달러 환율 하락(원화 강세)은 외국인 투자자들의 국내 증시 유입을 촉진할 수 있으며, 이는 코스피 지수 상승에 긍정적인 영향을 미칠 수 있습니다. 또한, 반도체 사이클 회복 기대감도 여전히 유효합니다.</div><div class="vhow"><b>어떻게:</b> 환율 하락에 따른 수혜가 예상되는 업종 및 외국인 순매수세가 집중되는 대형주 중심으로 포트폴리오를 구성하는 것을 고려해 볼 수 있습니다.</div></div></div><div class="view"><span class="badge b-neu">중립</span><div><div class="vname">달러·현금성 자산 <span class="horizon">단기</span></div><div class="vwhy">원/달러 환율이 하락세를 보이고 있어 달러의 매력도가 다소 감소했습니다. 하지만 글로벌 불확실성이 상존하는 만큼, 여전히 안전자산으로서의 역할은 유효합니다.</div><div class="vhow"><b>어떻게:</b> 환율 하락 추세가 지속될 경우 달러 자산 비중을 점진적으로 축소하고, 현금성 자산으로 보유하며 시장 상황을 관망하는 전략이 유효할 수 있습니다.</div></div></div><div class="view"><span class="badge b-warn">주의</span><div><div class="vname">미국 국채 <span class="horizon">중기</span></div><div class="vwhy">미국 10년물 국채 금리가 소폭 상승세를 보이며 금리 인하 기대감이 다소 후퇴하는 모습을 보이고 있습니다. 이는 국채 가격에 부담으로 작용할 수 있습니다.</div><div class="vhow"><b>어떻게:</b> 금리 상승 추세가 지속될 경우 국채 투자 비중을 줄이고, 금리 하락 전환 시점을 기다리는 것이 현명할 수 있습니다.</div></div></div><div class="view"><span class="badge b-warn">주의</span><div><div class="vname">에너지 관련 <span class="horizon">단기</span></div><div class="vwhy">국제 유가(WTI)가 소폭 하락세를 보이며 지정학적 리스크 완화 또는 수요 둔화 우려가 반영되는 모습입니다. 이는 에너지 관련 상품에 부정적인 영향을 줄 수 있습니다.</div><div class="vhow"><b>어떻게:</b> 유가 하락 추세가 지속될 경우 에너지 관련 투자에 신중해야 하며, 지정학적 이슈 재점화 여부를 면밀히 관찰해야 합니다.</div></div></div><div class="sec">📊 핵심 지표 <small>숫자 옆에 '무슨 뜻인지' 한 줄</small></div><div class="grid"><div class="ind"><div class="name">원/달러 환율</div><div class="val">1,529원 <span class="chg down">▼ 0.85%</span></div><div class="mean">원/달러 환율이 하락하며 원화 강세를 나타내고 있습니다. 이는 외국인 투자자들의 국내 증시 유입을 촉진하고 수출 기업의 채산성에는 부담을 줄 수 있습니다.</div><span class="csrc">출처 yfinance · 2026-07-06</span></div><div class="ind"><div class="name">국제 유가 (WTI)</div><div class="val">$68.32 <span class="chg down">▼ 0.54%</span></div><div class="mean">국제 유가(WTI)가 소폭 하락했습니다. 이는 지정학적 긴장 완화 또는 글로벌 경기 둔화 우려를 반영할 수 있으며, 인플레이션 압력 완화 요인으로 작용할 수 있습니다.</div><span class="csrc">출처 yfinance · 2026-07-05</span></div><div class="ind"><div class="name">코스피</div><div class="val">8,088.34 <span class="chg up">▲ 5.76%</span></div><div class="mean">코스피 지수가 소폭 상승 마감했습니다. 원화 강세와 일부 업종의 강세가 지수 상승을 견인했으나, 미국 증시의 약세 등 대외 변수에 영향을 받으며 상승폭은 제한적이었습니다.</div><span class="csrc">출처 yfinance · 2026-07-03</span></div><div class="ind"><div class="name">미 국채 10년 금리</div><div class="val">4.49% <span class="chg up">▲ 0.22%</span></div><div class="mean">미국 10년물 국채 금리가 소폭 상승했습니다. 이는 연준의 금리 인하 시점에 대한 불확실성이 일부 작용하며 안전자산 선호 심리를 강화하는 요인이 될 수 있습니다.</div><span class="csrc">출처 yfinance · 2026-07-02</span></div><div class="ind"><div class="name">금 가격 (온스당)</div><div class="val">+2.21% <span class="chg up">최근 24시간 내 급등</span></div><div class="mean">금 가격의 급등은 글로벌 불확실성 증대 및 실질금리 하락 기대감에 따른 안전자산 선호 심리 강화로 해석됩니다. 이는 한국 시장의 금 관련 ETF에도 긍정적인 영향을 미칠 수 있습니다.</div><span class="csrc">출처 yfinance</span></div><div class="ind"><div class="name">VIX 공포지수</div><div class="val">-2.65% <span class="chg down">하락세</span></div><div class="mean">VIX 지수의 하락은 시장의 단기적인 변동성 축소 및 투자 심리 개선을 시사합니다. 이는 위험자산 투자에 긍정적인 신호로 해석될 수 있습니다.</div><span class="csrc">출처 yfinance</span></div></div><div class="sec">📈 전체 시세 <small>자동수집 · 투명 공개</small></div><div class="mqgrid"><div class="mq"><span class="mqn">코스피</span><span class="mqv">8,088.34</span><span class="chg up">▲ 5.76%</span></div><div class="mq"><span class="mqn">코스닥</span><span class="mqv">868.41</span><span class="chg up">▲ 0.19%</span></div><div class="mq"><span class="mqn">S&amp;P500</span><span class="mqv">7,483.24</span><span class="chg up">▲ 0.00%</span></div><div class="mq"><span class="mqn">나스닥</span><span class="mqv">25,832.67</span><span class="chg down">▼ 0.80%</span></div><div class="mq"><span class="mqn">VIX</span><span class="mqv">16.15</span><span class="chg down">▼ 2.65%</span></div><div class="mq"><span class="mqn">원/달러</span><span class="mqv">1,529원</span><span class="chg down">▼ 0.85%</span></div><div class="mq"><span class="mqn">달러지수</span><span class="mqv">100.89</span><span class="chg up">▲ 0.03%</span></div><div class="mq"><span class="mqn">WTI유가</span><span class="mqv">$68.32</span><span class="chg down">▼ 0.54%</span></div><div class="mq"><span class="mqn">금</span><span class="mqv">$4,203.50</span><span class="chg up">▲ 2.21%</span></div><div class="mq"><span class="mqn">미10년물</span><span class="mqv">4.49%</span><span class="chg up">▲ 0.22%</span></div></div><div class="sec">🔗 오늘의 흐름 <small>→ 옆으로 밀어보세요 · 사건이 한국까지 오는 길</small></div><div class="hflow"><div class="hstep"><span class="tag">사건</span><b>글로벌 지정학적 불확실성 및 실질금리 변동</b><p>국제 사회의 긴장 고조 또는 완화, 그리고 미국 연준의 통화정책 방향에 대한 시장의 해석 변화가 금 가격과 미국 국채 금리에 영향을 미칩니다.</p></div><div class="harrow">→</div><div class="hstep"><span class="tag">1차</span><b>안전자산 선호 심리 강화 (금 가격 상승)</b><p>지정학적 불확실성 증대 또는 실질금리 하락 기대감은 안전자산인 금 가격의 상승을 견인합니다.</p></div><div class="harrow">→</div><div class="hstep"><span class="tag kr">2차</span><b>원/달러 환율 하락 (원화 강세)</b><p>글로벌 유동성 증가 및 위험 회피 심리 완화는 달러 약세, 원화 강세로 이어져 원/달러 환율 하락을 유발합니다.</p></div><div class="harrow">→</div><div class="hstep"><span class="tag kr">3차</span><b>한국 증시 영향 (외국인 자금 유입)</b><p>원화 강세는 외국인 투자자들의 국내 증시 투자 매력을 높여 순매수 유입을 촉진하고, 이는 코스피 지수 상승에 긍정적인 영향을 미칩니다.</p></div><div class="harrow">→</div><div class="hstep"><span class="tag kr">한국</span><b>투자 심리 및 포트폴리오 조정</b><p>금 가격 상승과 원화 강세라는 상반된 신호 속에서 투자자들은 안전자산 비중을 늘리거나, 환율 하락 수혜주에 주목하는 등 포트폴리오 조정을 고려합니다.</p></div></div><div class="sec">📅 이번 주 흐름 <small>무게중심이 어디로 옮겨갔나</small></div><div class="shift"><div class="from"><div class="k">지난주까지 주인공</div><div class="v">지난주: 미국 물가 지표 발표와 연준 금리 인하 기대감 후퇴</div></div><div class="mid">➜</div><div class="to"><div class="k">이번 주 주인공</div><div class="v">이번 주: 금리 인하 시점 불확실성 속 안전자산 랠리</div></div></div><ul class="bullets"><li>미국 CPI 발표 이후 연준 금리 인하 시점이 늦춰질 것이라는 전망이 우세해졌습니다.</li><li>이에 따라 금 가격이 급등하며 안전자산 선호 심리가 강화되는 모습입니다.</li><li>원/달러 환율은 하락세를 보이며 원화 강세가 나타나고 있습니다.</li></ul><div class="chips"><span class="chip weak"><span class="dot">▼</span>지정학·에너지 약화중</span><span class="chip str"><span class="dot">▲</span>금·안전자산 강화중</span><span class="chip neu">미국 금리 전망 중립</span></div><div class="sec">🗓️ 이번 달 테마 <small>올해 큰 그림의 한 장면</small></div><div class="theme"><div class="tt">7월, 금리 인하 불확실성 속 &#x27;안전자산&#x27;과 &#x27;원화 강세&#x27; 주목</div><p>7월은 미국 연준의 금리 인하 시점에 대한 불확실성이 지속될 것으로 예상됩니다. <b>높은 물가 지표</b>와 <b>견조한 고용 시장</b>은 연준의 신중한 태도를 유지하게 할 가능성이 높습니다. 이러한 환경 속에서 <b>금 가격의 상승세</b>는 더욱 두드러질 수 있으며, 이는 글로벌 금융 시장의 안전자산 선호 심리를 강화할 것입니다. 또한, 원/달러 환율의 하락세는 <b>원화 강세</b>를 이끌며 국내 증시에 긍정적인 영향을 미칠 수 있습니다. 따라서 투자자들은 금 관련 상품 및 원화 강세 수혜 업종에 대한 관심을 높일 필요가 있습니다. 다만, 지정학적 리스크의 재점화 가능성 등 예상치 못한 변수에도 대비해야 합니다.</p><div class="chips"><span class="chip watch">⏳ 미국 CPI 재확인</span><span class="chip watch">🇺🇸 연준 금리 결정 주시</span><span class="chip watch">💰 원/달러 환율 추이 관찰</span></div></div><div class="sec">🎯 시나리오 현황 <small>오늘 이벤트로 강화/약화된 가설 · 적중 추적</small></div><div class="chips scn"><span class="chip watch">글로벌 반도체 사이클 회복과 IT 대장주(삼성전자/SK하이닉스) 동조화 <b style="opacity:.7">활성·100%</b></span><span class="chip str"><span class="dot">▲</span>미국 실질금리 하락에 따른 안전자산(금/은) 랠리 <b style="opacity:.7">강화중·65%</b></span><span class="chip weak"><span class="dot">▼</span>고환율(달러 강세) 지속과 한국 수출 대형주의 실적 대칭 <b style="opacity:.7">약화중·60%</b></span><span class="chip weak"><span class="dot">▼</span>연준 금리 인하 사이클과 코스피 유동성 환율 랠리 <b style="opacity:.7">약화중·5%</b></span><span class="chip weak"><span class="dot">▼</span>국제유가(WTI) 급등과 한국 인플레이션 압력 및 금리 동결 연장 <b style="opacity:.7">약화중·0%</b></span></div><details><summary>📖 어려운 말 풀이 (펼치기)</summary><div class="term"><b>실질금리</b> <span>— 명목금리에서 물가상승률을 뺀 금리로, 돈의 실질적인 구매력을 나타냅니다. 실질금리가 낮아지면 안전자산 선호 심리가 강해지는 경향이 있습니다.</span></div><div class="term"><b>VIX 공포지수</b> <span>— 시카고옵션거래소(CBOE)에서 발표하는 지수로, S&amp;P 500 지수 옵션의 내재 변동성을 나타냅니다. 일반적으로 VIX 지수가 상승하면 시장의 불안감이 커지고 하락하면 안정되는 경향을 보입니다.</span></div><div class="term"><b>원/달러 환율</b> <span>— 미국 달러와 대한민국 원화의 교환 비율을 나타냅니다. 환율이 상승하면 원화 가치가 하락(달러 강세)하고, 하락하면 원화 가치가 상승(원화 강세)합니다.</span></div></details><div class="sec">🔗 참고 기사 및 출처</div><ul class="bullets" style="margin-top:5px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 15px 10px 30px;"><li><a href="https://www.sedaily.com" target="_blank" rel="noopener noreferrer" style="color:var(--down);text-decoration:none;font-weight:600;">금값, 온스당 2300달러 돌파…&#x27;킹달러&#x27; 주춤하자 안전자산 랠리 (출처: www.sedaily.com)</a></li><li><a href="https://www.hankyung.com" target="_blank" rel="noopener noreferrer" style="color:var(--down);text-decoration:none;font-weight:600;">원/달러 환율 1520원대 하락…외국인 증권사 순매수 (출처: www.hankyung.com)</a></li><li><a href="https://www.yna.co.kr" target="_blank" rel="noopener noreferrer" style="color:var(--down);text-decoration:none;font-weight:600;">국제유가, 이란-이스라엘 긴장 완화에 하락…WTI 0.5%↓ (출처: www.yna.co.kr)</a></li><li><a href="https://www.mk.co.kr" target="_blank" rel="noopener noreferrer" style="color:var(--down);text-decoration:none;font-weight:600;">미국 증시, 금리 인하 기대 후퇴에 나스닥 0.8%↓ (출처: www.mk.co.kr)</a></li></ul><div class="src">📌 시세=yfinance(자동수집) · 환율=연합인포맥스 · 유가=로이터 · 금=로이터</div><div class="nav"><a href="/">← 최신 브리핑</a></div><div class="disc">본 자료는 거시 흐름 학습·관찰용이며 투자 자문이나 매매 권유가 아닙니다.<br>모든 수치는 출처를 명시했고, 검증 불가 수치는 제외했습니다. 투자 판단과 책임은 본인에게 있습니다.</div></div></body></html>
