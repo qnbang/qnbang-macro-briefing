@@ -1,95 +1,95 @@
 {
-  "updated": "2026-07-15 23:27",
+  "updated": "2026-07-16 23:23",
   "market": {
     "DXY": {
-      "id": 391,
+      "id": 401,
       "indicator": "DXY",
-      "value": 100.5,
+      "value": 100.71,
       "unit": "pt",
-      "timestamp": "2026-07-15",
-      "source": "yfinance",
-      "daily_change": -0.44
-    },
-    "GOLD": {
-      "id": 393,
-      "indicator": "GOLD",
-      "value": 4064.8,
-      "unit": "USD/온스",
-      "timestamp": "2026-07-15",
-      "source": "yfinance",
-      "daily_change": 0.09
-    },
-    "KOSDAQ": {
-      "id": 386,
-      "indicator": "KOSDAQ",
-      "value": 783.98,
-      "unit": "pt",
-      "timestamp": "2026-07-14",
-      "source": "yfinance",
-      "daily_change": -1.92
-    },
-    "KOSPI": {
-      "id": 385,
-      "indicator": "KOSPI",
-      "value": 6856.83,
-      "unit": "pt",
-      "timestamp": "2026-07-14",
-      "source": "yfinance",
-      "daily_change": 0.73
-    },
-    "NDX": {
-      "id": 388,
-      "indicator": "NDX",
-      "value": 26269.23,
-      "unit": "pt",
-      "timestamp": "2026-07-15",
-      "source": "yfinance",
-      "daily_change": 0.62
-    },
-    "SPX": {
-      "id": 387,
-      "indicator": "SPX",
-      "value": 7572.4,
-      "unit": "pt",
-      "timestamp": "2026-07-15",
-      "source": "yfinance",
-      "daily_change": 0.38
-    },
-    "US10Y": {
-      "id": 394,
-      "indicator": "US10Y",
-      "value": 4.55,
-      "unit": "%",
-      "timestamp": "2026-07-15",
-      "source": "yfinance",
-      "daily_change": -0.87
-    },
-    "USDKRW": {
-      "id": 390,
-      "indicator": "USDKRW",
-      "value": 1486.42,
-      "unit": "원",
       "timestamp": "2026-07-16",
       "source": "yfinance",
-      "daily_change": -0.1
+      "daily_change": 0.21
     },
-    "VIX": {
-      "id": 389,
-      "indicator": "VIX",
-      "value": 15.67,
+    "GOLD": {
+      "id": 403,
+      "indicator": "GOLD",
+      "value": 3983.0,
+      "unit": "USD/온스",
+      "timestamp": "2026-07-16",
+      "source": "yfinance",
+      "daily_change": -1.51
+    },
+    "KOSDAQ": {
+      "id": 396,
+      "indicator": "KOSDAQ",
+      "value": 829.43,
       "unit": "pt",
       "timestamp": "2026-07-15",
       "source": "yfinance",
-      "daily_change": -5.03
+      "daily_change": 5.8
     },
-    "WTI": {
-      "id": 392,
-      "indicator": "WTI",
-      "value": 80.29,
-      "unit": "USD/배럴",
+    "KOSPI": {
+      "id": 395,
+      "indicator": "KOSPI",
+      "value": 7284.41,
+      "unit": "pt",
       "timestamp": "2026-07-15",
       "source": "yfinance",
-      "daily_change": 1.2
+      "daily_change": 6.24
+    },
+    "NDX": {
+      "id": 398,
+      "indicator": "NDX",
+      "value": 25881.95,
+      "unit": "pt",
+      "timestamp": "2026-07-16",
+      "source": "yfinance",
+      "daily_change": -1.47
+    },
+    "SPX": {
+      "id": 397,
+      "indicator": "SPX",
+      "value": 7533.77,
+      "unit": "pt",
+      "timestamp": "2026-07-16",
+      "source": "yfinance",
+      "daily_change": -0.51
+    },
+    "US10Y": {
+      "id": 404,
+      "indicator": "US10Y",
+      "value": 4.57,
+      "unit": "%",
+      "timestamp": "2026-07-16",
+      "source": "yfinance",
+      "daily_change": 0.53
+    },
+    "USDKRW": {
+      "id": 400,
+      "indicator": "USDKRW",
+      "value": 1478.85,
+      "unit": "원",
+      "timestamp": "2026-07-17",
+      "source": "yfinance",
+      "daily_change": -0.49
+    },
+    "VIX": {
+      "id": 399,
+      "indicator": "VIX",
+      "value": 16.73,
+      "unit": "pt",
+      "timestamp": "2026-07-16",
+      "source": "yfinance",
+      "daily_change": 6.76
+    },
+    "WTI": {
+      "id": 402,
+      "indicator": "WTI",
+      "value": 78.99,
+      "unit": "USD/배럴",
+      "timestamp": "2026-07-16",
+      "source": "yfinance",
+      "daily_change": -0.77
     },
     "WTI유가": {
       "id": 3,
@@ -128,5 +128,5 @@
       "daily_change": null
     }
   },
-  "latest_briefing_id": "daily-2026-07-16"
+  "latest_briefing_id": "daily-2026-07-17"
 }
