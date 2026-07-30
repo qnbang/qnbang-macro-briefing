@@ -7,9 +7,9 @@
 ## 구조 — 맥이 꺼져 있어도 매일 자동
 
 ```
-[매일 아침] 클라우드 예약 에이전트(클로드 헤드리스·구독, 추가비용 0원)
+[매일 아침 07:30 KST] GitHub Actions(daily-briefing.yml)가 auto_briefing.py 실행 (추가비용 0원)
    1) fetch_market.py   — yfinance로 시장 '숫자' 수집 → DB
-   2) (클로드 분석)      — 웹 리서치 → 시나리오 대조 → 한국자산 시사점
+   2) (auto_briefing 분석) — 웹 리서치 → 시나리오 대조 → 한국자산 시사점
    3) store_briefing.py — 브리핑 본문·시나리오 이력 DB 기록
    4) build_site.py     — DB → 정적 대시보드(site/) 렌더
    5) git push          — DB·site/ 커밋·푸시
@@ -29,7 +29,7 @@ LLM은 산문을 쓰되 **새 숫자를 만들 수 없다.**
 | `브리핑기/db.py` | DB 스키마 + 시나리오 시드 |
 | `브리핑기/fetch_market.py` | 시장 숫자 수집(yfinance) → `market_data` |
 | `브리핑기/store_briefing.py` | 브리핑 본문·시나리오 이력 저장 헬퍼 |
-| `브리핑기/오늘브리핑_seed.py` | 브리핑 본문 dict **형식 견본** + 1회 실행본 |
+| `브리핑기/auto_briefing.py` | 매일 자동 발행 파이프라인(시세→리서치→본문 생성→DB 기록→렌더). 본문 dict 형식은 이 파일의 `USER_PROMPT_TEMPLATE`이 기준 |
 | `브리핑기/build_site.py` | DB → 정적 대시보드(`site/`) 렌더 |
 | `site/` | 배포되는 정적 산출물(index·archive·data.json) |
 | `macro_briefing.db` | 시나리오·시세·브리핑·이력 (단일 진실원) |
@@ -38,12 +38,10 @@ LLM은 산문을 쓰되 **새 숫자를 만들 수 없다.**
 
 ```bash
 cd 브리핑기
-.venv/bin/python fetch_market.py        # 시세 수집
-.venv/bin/python 오늘브리핑_seed.py      # (오늘은 견본) 브리핑 기록
-.venv/bin/python build_site.py          # site/ 렌더
+.venv/bin/python auto_briefing.py       # 시세 수집 → 리서치 → 본문 생성 → DB 기록 → 렌더까지 한 번에
 ```
 
-## 매일 자동 — 클라우드 예약 에이전트가 하는 일
+## 매일 자동 — GitHub Actions(daily-briefing.yml)가 하는 일
 
 매일 아침 아래를 순서대로 수행하고 푸시한다(이 README의 "구조" 참고):
 `fetch_market.py` → 웹 리서치·분석으로 새 브리핑 dict 작성 → `store_briefing.upsert_briefing`/`log_scenario` →
